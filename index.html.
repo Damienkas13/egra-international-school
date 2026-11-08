@@ -134,6 +134,18 @@
   <p>© 2026 EGRA INTERNATIONAL SCHOOL</p>
   <p>Academic Year 2026–2027</p>
 </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+const SUPABASE_URL = "https://iqjdkeafeedgfkwxbiqk.supabase.co";
+const SUPABASE_KEY = "sb_publishable_HxA5631QYdh5AEYmYvuQYw_8sVIV6gg";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+console.log("EGRA INTERNATIONAL SCHOOL connected!");
+</script>
 </body>
 </html>
