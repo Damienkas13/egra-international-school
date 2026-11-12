@@ -147,5 +147,139 @@ const supabaseClient = window.supabase.createClient(
 
 console.log("EGRA INTERNATIONAL SCHOOL connected!");
 </script>
+<!-- EGRA INTERNATIONAL SCHOOL REPORT CARD MODULE -->
+<section class="card" id="reportCardModule">
+  <h2>Student Report Cards / Bulletins Scolaires</h2>
+
+  <label>Student Name / Nom de l'élève</label>
+  <input id="studentName" type="text" placeholder="Student full name">
+
+  <label>Admission Number / Numéro d'admission</label>
+  <input id="admissionNumber" type="text" placeholder="Admission number">
+
+  <label>Class / Classe</label>
+  <input id="studentClass" type="text" placeholder="e.g. Grade 7">
+
+  <label>Language / Langue</label>
+  <select id="reportLanguage">
+    <option value="en">English</option>
+    <option value="fr">Français</option>
+  </select>
+
+  <h3>Subject Marks / Notes par matière</h3>
+
+  <div id="subjectMarks">
+    <input class="subject" placeholder="Subject / Matière">
+    <input class="mark" type="number" min="0" max="100" placeholder="Mark / Note">
+  </div>
+
+  <button type="button" onclick="addSubject()">Add Subject / Ajouter matière</button>
+  <button type="button" onclick="generateReport()">Generate Report / Générer</button>
+
+  <div id="reportResult"></div>
+</section>
+
+<script>
+function addSubject() {
+  const container = document.getElementById("subjectMarks");
+
+  const subject = document.createElement("input");
+  subject.className = "subject";
+  subject.placeholder = "Subject / Matière";
+
+  const mark = document.createElement("input");
+  mark.className = "mark";
+  mark.type = "number";
+  mark.min = 0;
+  mark.max = 100;
+  mark.placeholder = "Mark / Note";
+
+  container.appendChild(subject);
+  container.appendChild(mark);
+}
+
+function generateReport() {
+  const name = document.getElementById("studentName").value;
+  const admission = document.getElementById("admissionNumber").value;
+  const studentClass = document.getElementById("studentClass").value;
+  const language = document.getElementById("reportLanguage").value;
+
+  const subjects = document.querySelectorAll(".subject");
+  const marks = document.querySelectorAll(".mark");
+
+  if (!name || !admission || !studentClass) {
+    alert("Please complete student information.");
+    return;
+  }
+
+  let total = 0;
+  let count = 0;
+  let rows = "";
+
+  for (let i = 0; i < subjects.length; i++) {
+    const subject = subjects[i].value.trim();
+    const mark = marks[i].value;
+
+    if (!subject && mark === "") continue;
+
+    const score = Number(mark);
+
+    if (!subject || mark === "" || !Number.isFinite(score) || score < 0 || score > 100) {
+      alert("Enter a subject and a valid mark between 0 and 100.");
+      return;
+    }
+
+    total += score;
+    count++;
+
+    rows += `<tr><td>${escapeHTML(subject)}</td><td>${score}/100</td></tr>`;
+  }
+
+  if (count === 0) {
+    alert("Please enter at least one subject and mark.");
+    return;
+  }
+
+  const average = total / count;
+  const passed = average >= 50;
+
+  const title = language === "fr" ? "BULLETIN SCOLAIRE" : "STUDENT REPORT CARD";
+  const averageLabel = language === "fr" ? "Moyenne" : "Average";
+  const status = language === "fr"
+    ? (passed ? "ADMIS" : "ÉCHEC")
+    : (passed ? "PASS" : "FAIL");
+
+  document.getElementById("reportResult").innerHTML = `
+    <div id="printReport">
+      <h2>EGRA INTERNATIONAL SCHOOL</h2>
+      <h3>${title}</h3>
+      <p>Student: ${escapeHTML(name)}</p>
+      <p>Admission: ${escapeHTML(admission)}</p>
+      <p>Class: ${escapeHTML(studentClass)}</p>
+      <table border="1" cellpadding="8" width="100%">
+        <tr><th>Subject / Matière</th><th>Mark / Note</th></tr>
+        ${rows}
+      </table>
+      <h3>Total: ${total} / ${count * 100}</h3>
+      <h3>${averageLabel}: ${average.toFixed(2)}%</h3>
+      <h3>${status}</h3>
+      <p>Class position / Position en classe: To be calculated</p>
+      <p>Teacher's comments / Commentaires de l'enseignant:</p>
+      <p>Principal's signature / Signature du directeur: __________</p>
+    </div>
+    <button type="button" onclick="window.print()">Print / Imprimer PDF</button>
+  `;
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  })[char]);
+}
+</script>
 </body>
 </html>
